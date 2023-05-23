@@ -1,24 +1,17 @@
-import logo from './logo.svg';
-import './App.css';
+import { StyledEngineProvider, ThemeProvider } from "@mui/material";
+import themes from "./themes";
+import { useSelector } from "react-redux";
+import Routes from "./routes";
 
 function App() {
+  const { customization } = useSelector((state) => state);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <StyledEngineProvider injectFirst>
+      <ThemeProvider theme={themes(customization)}>
+        <Routes />
+      </ThemeProvider>
+    </StyledEngineProvider>
   );
 }
 
