@@ -6,13 +6,13 @@ import "./style.css";
 import Timer from "../components/Timer";
 
 const DATA =
-    "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. Aliquam consectetur erat nunc, quis scelerisque ipsum pellentesque quis. Nullam accumsan vitae nulla nec bibendum. Etiam vehicula mauris non neque dignissim tempus vitae eu nulla. Aliquam tincidunt vestibulum mauris, eu blandit tellus gravida vitae. Aliquam gravida eros volutpat dolor aliquet, at iaculis dolor suscipit. Proin sed ex quam. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Donec blandit, leo nec tempus viverra, nisl neque sodales massa, non sollicitudin sapien lorem in risus. Nunc leo ligula, posuere et ullamcorper sit amet, pretium et urna. Sed commodo mauris quis eros sodales maximus. Aliquam ultrices in mauris id fringilla. Donec elit enim, pellentesque eu blandit ac, auctor non sapien. Pellentesque eget elit efficitur, cursus est eget, molestie dolor. Fusce ultrices vehicula velit a posuere. Pellentesque egestas et eros in aliquet. Mauris in neque placerat, mollis felis nec, rutrum mi.";
+    "A wonderful serenity has taken possession of my entire soul, like these sweet mornings of spring which I enjoy with my whole heart. I am alone, and feel the charm of existence in this spot, which was created for the bliss of souls like mine. I am so happy, my dear friend, so absorbed in the exquisite sense of mere tranquil existence, that I neglect my talents. I should be incapable of drawing a single stroke at the present moment; and yet I feel that I never was a greater artist than now. When, while the lovely valley teems with";
 
 const Home = () => {
     const textRef = useRef(null);
-    const bugArr = [];
+    let bugArr = [];
     let sum = -1;
-    let modifiedText;
+    let modifiedText = [];
 
     const updateSum = (newSum) => {
         sum = newSum;
@@ -22,8 +22,6 @@ const Home = () => {
         targets: ".letter",
         easing: "easeInOutExpo"
     });
-
-    document.addEventListener("keydown", () => console.log(sum, bugArr, modifiedText));
 
     useEffect(() => {
         const elementRef = textRef;
@@ -65,7 +63,7 @@ const Home = () => {
                 translateX: 0,
                 translateY: 0,
                 duration: 1000,
-                delay: anime.stagger(20, { grid: [18, 74], from: "center" })
+                delay: anime.stagger(20, { grid: [8, 67], from: "center" })
             });
 
         animation.seek(0);
@@ -95,6 +93,8 @@ const Home = () => {
         modifiedText = modifiedText.join("");
         modifiedText = modifiedText.split(" ").filter((word) => !word.includes("_"));
         modifiedText = modifiedText.filter((word) => word.trim().length);
+        // setText(modifiedText);
+        return sum >= 0 ? Math.round(modifiedText.length * ((sum + 1 - bugArr.length) / (sum + 1))) : 0;
     };
 
     const bugAnimation = () => {
@@ -173,12 +173,11 @@ const Home = () => {
 
     return (
         <Grid2
+            container
             sx={{
                 width: "100%",
                 height: "100%",
                 display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
                 flexFlow: "column"
             }}
         >
@@ -190,9 +189,12 @@ const Home = () => {
                 bugArr={bugArr}
                 updateSum={updateSum}
                 textRef={textRef}
-                modifiedText={modifiedText}
             />
-            <Typography ref={textRef} variant="h3" width="70%" color="#666" textAlign="center" position="relative"></Typography>
+            <Grid2 sx={{ flex: "auto", height: "100%" }}>
+                <Grid2 sx={{ height: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
+                    <Typography ref={textRef} variant="h3" width="70%" color="#666" textAlign="center" position="relative"></Typography>
+                </Grid2>
+            </Grid2>
         </Grid2>
     );
 };

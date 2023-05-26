@@ -1,14 +1,17 @@
 import React, { useState, useEffect, useRef } from "react";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import { Box } from "@mui/material";
+import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
 
-function Timer({ countdownInitialTime, animation, calcResult, keyDown, bugArr, updateSum, textRef, modifiedText }) {
+const testTime = 60;
+
+function Timer({ countdownInitialTime, animation, calcResult, keyDown, bugArr, updateSum, textRef }) {
     const blurRef = useRef();
     const [countdown, setCountdown] = useState(countdownInitialTime);
     const [isActive, setIsActive] = useState(false);
-    const [timeLeft, setTimeLeft] = useState(10);
+    const [timeLeft, setTimeLeft] = useState(testTime);
     const [isTimedOut, setIsTimedOut] = useState(false);
+    const [WPM, setWPM] = useState(0);
 
     useEffect(() => {
         let countdownInterval = null;
@@ -21,19 +24,19 @@ function Timer({ countdownInitialTime, animation, calcResult, keyDown, bugArr, u
         } else if (isActive && countdown === 0) {
             countdownInterval = setInterval(() => {
                 setTimeLeft((prevTimeLeft) => {
+                    if (prevTimeLeft <= testTime) document.addEventListener("keydown", keyDown);
+                    if (prevTimeLeft === 1) document.removeEventListener("keydown", keyDown);
                     if (prevTimeLeft === 0) {
                         clearInterval(countdownInterval);
                         clearInterval(timerInterval);
                         setIsTimedOut(true);
                         setIsActive(false);
-                        calcResult();
-                        document.removeEventListener("keydown", keyDown);
+                        setWPM(calcResult());
                         return 0;
                     }
                     return prevTimeLeft;
                 });
             }, 1000);
-            document.addEventListener("keydown", keyDown);
 
             timerInterval = setInterval(() => {
                 setTimeLeft((prevTimeLeft) => prevTimeLeft - 1);
@@ -42,13 +45,13 @@ function Timer({ countdownInitialTime, animation, calcResult, keyDown, bugArr, u
             clearInterval(countdownInterval);
             clearInterval(timerInterval);
             setCountdown(countdownInitialTime);
-            setTimeLeft(10);
+            setTimeLeft(testTime);
         }
 
         return () => {
+            document.removeEventListener("keydown", keyDown);
             clearInterval(countdownInterval);
             clearInterval(timerInterval);
-            document.removeEventListener("keydown", keyDown);
         };
     }, [isActive, countdown]);
 
@@ -72,8 +75,7 @@ function Timer({ countdownInitialTime, animation, calcResult, keyDown, bugArr, u
         blurRef.current.blur();
         animation.play();
         clearText();
-        bugArr.length = 0;
-        modifiedText = null;
+        bugArr = [];
         updateSum(-1);
     }
 
@@ -97,19 +99,29 @@ function Timer({ countdownInitialTime, animation, calcResult, keyDown, bugArr, u
     const seconds = timeLeft % 60;
 
     return (
-        <Box sx={{ display: "flex", justifyContent: "center", flexFlow: "column", zIndex: 9999 }}>
+        <Grid2
+            width={true}
+            sx={{
+                background: "transparent",
+                display: "flex",
+                justifyContent: "center",
+                flexFlow: "column",
+                alignItems: "center",
+                zIndex: 9999
+            }}
+        >
             {isTimedOut ? (
                 <Typography variant="h3" fontSize="80px" color="#F95738">
-                    Finish
+                    {WPM} WPM
                 </Typography>
             ) : (
                 <Typography variant="h3" fontSize="80px" color="#F95738">
                     {formatTime(minutes)}:{formatTime(seconds)}
                 </Typography>
             )}
-            <Typography variant="h3" fontSize="80px" color="#F95738">
+            {/* <Typography variant="h3" fontSize="80px" color="#F95738">
                 {countdown}
-            </Typography>
+            </Typography> */}
             {!isActive ? (
                 <Button ref={blurRef} variant="contained" color="primary" onClick={startTimer}>
                     Start
@@ -119,7 +131,7 @@ function Timer({ countdownInitialTime, animation, calcResult, keyDown, bugArr, u
                     Retry
                 </Button>
             )}
-        </Box>
+        </Grid2>
     );
 }
 
