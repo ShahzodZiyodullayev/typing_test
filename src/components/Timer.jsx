@@ -3,17 +3,12 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { Box } from "@mui/material";
 
-function Timer({ countdownInitialTime, animation, calcResult, keyDown, bugArr, sum, textRef, modifiedText }) {
+function Timer({ countdownInitialTime, animation, calcResult, keyDown, bugArr, updateSum, textRef, modifiedText }) {
     const blurRef = useRef();
     const [countdown, setCountdown] = useState(countdownInitialTime);
     const [isActive, setIsActive] = useState(false);
     const [timeLeft, setTimeLeft] = useState(10);
     const [isTimedOut, setIsTimedOut] = useState(false);
-
-    useEffect(() => {
-        console.log(bugArr);
-        console.log(sum);
-    }, [isTimedOut]);
 
     useEffect(() => {
         let countdownInterval = null;
@@ -60,18 +55,18 @@ function Timer({ countdownInitialTime, animation, calcResult, keyDown, bugArr, s
     const clearText = () => {
         const elementRef = textRef;
 
-        elementRef.current.childNodes[0].style.backgroundColor = "#CAFE48";
-        elementRef.current.childNodes[0].style.color = "#000";
         elementRef.current.childNodes.forEach((el) => {
             el.style.color = "#666";
+            el.style.backgroundColor = "transparent";
             if (el.classList.contains("bug")) {
                 el.classList.remove("bug");
             }
         });
+        elementRef.current.childNodes[0].style.backgroundColor = "#CAFE48";
+        elementRef.current.childNodes[0].style.color = "#000";
     };
 
     function startTimer() {
-        console.log(sum);
         setIsTimedOut(false);
         setIsActive(true);
         blurRef.current.blur();
@@ -79,7 +74,7 @@ function Timer({ countdownInitialTime, animation, calcResult, keyDown, bugArr, s
         clearText();
         bugArr.length = 0;
         modifiedText = null;
-        sum = -1;
+        updateSum(-1);
     }
 
     const clearAnimation = () => {

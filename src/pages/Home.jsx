@@ -14,12 +14,16 @@ const Home = () => {
     let sum = -1;
     let modifiedText;
 
+    const updateSum = (newSum) => {
+        sum = newSum;
+    };
+
     const animation = anime.timeline({
         targets: ".letter",
         easing: "easeInOutExpo"
     });
 
-    document.addEventListener("keydown", () => console.log(sum));
+    document.addEventListener("keydown", () => console.log(sum, bugArr, modifiedText));
 
     useEffect(() => {
         const elementRef = textRef;
@@ -91,9 +95,6 @@ const Home = () => {
         modifiedText = modifiedText.join("");
         modifiedText = modifiedText.split(" ").filter((word) => !word.includes("_"));
         modifiedText = modifiedText.filter((word) => word.trim().length);
-
-        console.log(modifiedText);
-        console.log(bugArr.length);
     };
 
     const bugAnimation = () => {
@@ -187,7 +188,7 @@ const Home = () => {
                 calcResult={calcResult}
                 keyDown={keyDown}
                 bugArr={bugArr}
-                sum={sum}
+                updateSum={updateSum}
                 textRef={textRef}
                 modifiedText={modifiedText}
             />
