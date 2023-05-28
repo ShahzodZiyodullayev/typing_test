@@ -57,16 +57,17 @@ function Timer({ countdownInitialTime, animation, calcResult, keyDown, bugArr, u
 
     const clearText = () => {
         const elementRef = textRef;
+        const m = elementRef.current.querySelectorAll(".letter");
 
-        elementRef.current.childNodes.forEach((el) => {
+        m.forEach((el) => {
             el.style.color = "#666";
             el.style.backgroundColor = "transparent";
             if (el.classList.contains("bug")) {
                 el.classList.remove("bug");
             }
         });
-        elementRef.current.childNodes[0].style.backgroundColor = "#CAFE48";
-        elementRef.current.childNodes[0].style.color = "#000";
+        m[0].style.backgroundColor = "#CAFE48";
+        m[0].style.color = "#000";
     };
 
     function startTimer() {

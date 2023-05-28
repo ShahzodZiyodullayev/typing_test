@@ -26,15 +26,22 @@ const Home = () => {
     useEffect(() => {
         const elementRef = textRef;
         const d = DATA.split("");
-        d.forEach((character) => {
-            const span = document.createElement("span");
-            span.textContent = character;
-            span.style.whiteSpace = "pre";
-            span.classList.add("letter");
-            elementRef.current.appendChild(span);
+        const words = DATA.split(" ");
+        words.forEach((word) => {
+            let w = document.createElement("em");
+            [...word.split(""), " "].forEach((letter) => {
+                let span = document.createElement("span");
+                span.textContent = letter;
+                span.style.whiteSpace = "pre";
+                span.classList.add("letter");
+
+                w.appendChild(span);
+            });
+            elementRef.current.appendChild(w);
         });
-        elementRef.current.childNodes[0].style.backgroundColor = "#CAFE48";
-        elementRef.current.childNodes[0].style.color = "#000";
+        const m = document.querySelectorAll(".letter");
+        m[0].style.backgroundColor = "#CAFE48";
+        m[0].style.color = "#000";
 
         animation
             .add({
@@ -128,42 +135,43 @@ const Home = () => {
     };
 
     const keyDown = (e) => {
+        const m = document.querySelectorAll(".letter");
         if (e.key === "Backspace") {
             if (sum >= 0) {
                 if (sum < DATA.length - 1) {
-                    textRef.current.childNodes[sum + 1].style.backgroundColor = "transparent";
-                    textRef.current.childNodes[sum + 1].style.color = "#666";
+                    m[sum + 1].style.backgroundColor = "transparent";
+                    m[sum + 1].style.color = "#666";
                 }
-                textRef.current.childNodes[sum].style.backgroundColor = "#CAFE48";
-                textRef.current.childNodes[sum].style.color = "#000";
-                textRef.current.childNodes[sum].classList.remove("bug");
+                m[sum].style.backgroundColor = "#CAFE48";
+                m[sum].style.color = "#000";
+                m[sum].classList.remove("bug");
                 if (bugArr[bugArr.length - 1] === sum) {
                     bugArr.pop();
                 }
                 --sum;
             }
-        } else if (e.key !== "Shift" && textRef.current.childNodes[sum + 1] && textRef.current.childNodes[sum + 1].textContent === e.key) {
+        } else if (e.key !== "Shift" && m[sum + 1] && m[sum + 1].textContent === e.key) {
             sum++;
             if (sum >= 0) {
-                textRef.current.childNodes[sum].style.backgroundColor = "transparent";
-                textRef.current.childNodes[sum].style.color = "#CAFE48"; // to'g'ri yozilgan harf rangi
-                textRef.current.childNodes[sum].style.opacity = 1;
+                m[sum].style.backgroundColor = "transparent";
+                m[sum].style.color = "#CAFE48"; // to'g'ri yozilgan harf rangi
+                m[sum].style.opacity = 1;
             }
             if (sum < DATA.length - 1) {
-                textRef.current.childNodes[sum + 1].style.backgroundColor = "#CAFE48";
-                textRef.current.childNodes[sum + 1].style.opacity = 1;
-                textRef.current.childNodes[sum + 1].style.color = "#000";
+                m[sum + 1].style.backgroundColor = "#CAFE48";
+                m[sum + 1].style.opacity = 1;
+                m[sum + 1].style.color = "#000";
             }
-        } else if (e.key !== "Shift" && textRef.current.childNodes[sum + 1] && textRef.current.childNodes[sum + 1].textContent !== e.key) {
+        } else if (e.key !== "Shift" && m[sum + 1] && m[sum + 1].textContent !== e.key) {
             sum++;
             if (sum < DATA.length - 1) {
-                textRef.current.childNodes[sum + 1].style.backgroundColor = "#CAFE48";
-                textRef.current.childNodes[sum + 1].style.color = "#000";
+                m[sum + 1].style.backgroundColor = "#CAFE48";
+                m[sum + 1].style.color = "#000";
             }
-            textRef.current.childNodes[sum].style.backgroundColor = "transparent";
-            textRef.current.childNodes[sum].style.opacity = 1;
-            textRef.current.childNodes[sum].style.color = "#F26171";
-            textRef.current.childNodes[sum].classList.add("bug");
+            m[sum].style.backgroundColor = "transparent";
+            m[sum].style.opacity = 1;
+            m[sum].style.color = "#F26171";
+            m[sum].classList.add("bug");
             bugArr.push(sum);
         }
         if (sum === DATA.length - 1) {
