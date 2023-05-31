@@ -24,7 +24,7 @@ const Home = () => {
             easing: "easeInOutExpo"
         });
         return animation;
-    }, []);
+    }, [DATA]);
 
     useEffect(() => {
         const elementRef = textRef;

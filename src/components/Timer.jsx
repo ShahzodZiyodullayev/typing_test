@@ -20,7 +20,7 @@ function Timer({
     textRef
 }) {
     const dispatch = useDispatch();
-    const { customization } = useSelector((state) => state);
+    const { customization, DATA } = useSelector((state) => state);
     const [countdown, setCountdown] = useState(countdownInitialTime);
     const [isActive, setIsActive] = useState(false);
     const [timeLeft, setTimeLeft] = useState(testTime);
@@ -46,7 +46,7 @@ function Timer({
                         clearInterval(timerInterval);
                         setIsTimedOut(true);
                         setIsActive(false);
-                        dispatch(setIsActiveTimer(false));
+                        // dispatch(setIsActiveTimer(false));
                         dispatch(setWpm(calcResult()));
                         return 0;
                     }
@@ -94,8 +94,8 @@ function Timer({
     const startTimer = () => {
         setIsTimedOut(false);
         setIsActive(true);
-        clearText();
         animation.play();
+        clearText();
         bugArr = [];
         updateSum(-1);
         dispatch(setIsActiveTimer(true));

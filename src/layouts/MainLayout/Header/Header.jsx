@@ -14,8 +14,8 @@ const Header = ({ children }) => {
         dispatch(themeMode(!customization.bool));
     };
 
-    const shuffle = async () => {
-        await dispatch(textSelector());
+    const shuffle = () => {
+        dispatch(textSelector());
     };
 
     return (
