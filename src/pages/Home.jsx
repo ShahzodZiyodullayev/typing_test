@@ -1,14 +1,14 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { Typography } from "@mui/material";
 import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
 import anime from "animejs/lib/anime.es.js";
 import "./style.css";
 import Timer from "../components/Timer";
-
-const DATA =
-    "A wonderful serenity has taken possession of my entire soul, like these sweet mornings of spring which I enjoy with my whole heart. I am alone, and feel the charm of existence in this spot, which was created for the bliss of souls like mine. I am so happy, my dear friend, so absorbed in the exquisite sense of mere tranquil existence, that I neglect my talents. I should be incapable of drawing a single stroke at the present moment; and yet I feel that I never was a greater artist than now. When, while the lovely valley teems with";
+import Header from "../layouts/MainLayout/Header/Header";
+import { useSelector } from "react-redux";
 
 const Home = () => {
+    const { DATA } = useSelector((state) => state);
     const textRef = useRef(null);
     let bugArr = [];
     let sum = -1;
@@ -18,14 +18,17 @@ const Home = () => {
         sum = newSum;
     };
 
-    const animation = anime.timeline({
-        targets: ".letter",
-        easing: "easeInOutExpo"
-    });
+    const animation = useMemo(() => {
+        let animation = anime.timeline({
+            targets: ".letter",
+            easing: "easeInOutExpo"
+        });
+        return animation;
+    }, []);
 
     useEffect(() => {
         const elementRef = textRef;
-        const d = DATA.split("");
+        elementRef.current.innerHTML = null;
         const words = DATA.split(" ");
         words.forEach((word) => {
             let w = document.createElement("em");
@@ -75,7 +78,7 @@ const Home = () => {
 
         animation.seek(0);
         animation.pause();
-    }, []);
+    }, [DATA]);
 
     const calcResult = () => {
         bugAnimation();
@@ -98,10 +101,16 @@ const Home = () => {
         });
 
         modifiedText = modifiedText.join("");
-        modifiedText = modifiedText.split(" ").filter((word) => !word.includes("_"));
+        modifiedText = modifiedText
+            .split(" ")
+            .filter((word) => !word.includes("_"));
         modifiedText = modifiedText.filter((word) => word.trim().length);
         // setText(modifiedText);
-        return sum >= 0 ? Math.round(modifiedText.length * ((sum + 1 - bugArr.length) / (sum + 1))) : 0;
+        return sum >= 0
+            ? Math.round(
+                  modifiedText.length * ((sum + 1 - bugArr.length) / (sum + 1))
+              )
+            : 0;
     };
 
     const bugAnimation = () => {
@@ -150,7 +159,11 @@ const Home = () => {
                 }
                 --sum;
             }
-        } else if (e.key !== "Shift" && m[sum + 1] && m[sum + 1].textContent === e.key) {
+        } else if (
+            e.key !== "Shift" &&
+            m[sum + 1] &&
+            m[sum + 1].textContent === e.key
+        ) {
             sum++;
             if (sum >= 0) {
                 m[sum].style.backgroundColor = "transparent";
@@ -162,7 +175,11 @@ const Home = () => {
                 m[sum + 1].style.opacity = 1;
                 m[sum + 1].style.color = "#000";
             }
-        } else if (e.key !== "Shift" && m[sum + 1] && m[sum + 1].textContent !== e.key) {
+        } else if (
+            e.key !== "Shift" &&
+            m[sum + 1] &&
+            m[sum + 1].textContent !== e.key
+        ) {
             sum++;
             if (sum < DATA.length - 1) {
                 m[sum + 1].style.backgroundColor = "#CAFE48";
@@ -186,21 +203,41 @@ const Home = () => {
                 width: "100%",
                 height: "100%",
                 display: "flex",
-                flexFlow: "column"
+                flexFlow: "column",
+                position: "relative",
+                alignItems: "center"
             }}
         >
-            <Timer
-                countdownInitialTime={Math.round(((DATA.length - 1) * 5 + 2000) / 1000)}
-                animation={animation}
-                calcResult={calcResult}
-                keyDown={keyDown}
-                bugArr={bugArr}
-                updateSum={updateSum}
-                textRef={textRef}
-            />
+            <Header>
+                <Timer
+                    countdownInitialTime={Math.round(
+                        ((DATA.length - 1) * 5 + 2000) / 1000
+                    )}
+                    animation={animation}
+                    calcResult={calcResult}
+                    keyDown={keyDown}
+                    bugArr={bugArr}
+                    updateSum={updateSum}
+                    textRef={textRef}
+                />
+            </Header>
             <Grid2 sx={{ flex: "auto", height: "100%" }}>
-                <Grid2 sx={{ height: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
-                    <Typography ref={textRef} variant="h3" width="70%" color="#666" textAlign="center" position="relative"></Typography>
+                <Grid2
+                    sx={{
+                        height: "100%",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center"
+                    }}
+                >
+                    <Typography
+                        ref={textRef}
+                        variant="h3"
+                        width="70%"
+                        color="#666"
+                        textAlign="center"
+                        position="relative"
+                    ></Typography>
                 </Grid2>
             </Grid2>
         </Grid2>

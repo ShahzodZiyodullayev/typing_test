@@ -1,17 +1,30 @@
-import React, { useState, useEffect, useRef } from "react";
-import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
+import { useState, useEffect } from "react";
+import { Box, IconButton, Typography } from "@mui/material";
 import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
+import StopIcon from "@mui/icons-material/Stop";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import Wpm from "./Wpm";
+import { useDispatch, useSelector } from "react-redux";
+import { setWpm } from "../reducers/wpm";
+import { setIsActiveTimer } from "../reducers/timer";
 
-const testTime = 60;
+const testTime = 10;
 
-function Timer({ countdownInitialTime, animation, calcResult, keyDown, bugArr, updateSum, textRef }) {
-    const blurRef = useRef();
+function Timer({
+    countdownInitialTime,
+    animation,
+    calcResult,
+    keyDown,
+    bugArr,
+    updateSum,
+    textRef
+}) {
+    const dispatch = useDispatch();
+    const { customization } = useSelector((state) => state);
     const [countdown, setCountdown] = useState(countdownInitialTime);
     const [isActive, setIsActive] = useState(false);
     const [timeLeft, setTimeLeft] = useState(testTime);
     const [isTimedOut, setIsTimedOut] = useState(false);
-    const [WPM, setWPM] = useState(0);
 
     useEffect(() => {
         let countdownInterval = null;
@@ -24,14 +37,17 @@ function Timer({ countdownInitialTime, animation, calcResult, keyDown, bugArr, u
         } else if (isActive && countdown === 0) {
             countdownInterval = setInterval(() => {
                 setTimeLeft((prevTimeLeft) => {
-                    if (prevTimeLeft <= testTime) document.addEventListener("keydown", keyDown);
-                    if (prevTimeLeft === 1) document.removeEventListener("keydown", keyDown);
+                    if (prevTimeLeft <= testTime)
+                        document.addEventListener("keydown", keyDown);
+                    if (prevTimeLeft === 1)
+                        document.removeEventListener("keydown", keyDown);
                     if (prevTimeLeft === 0) {
                         clearInterval(countdownInterval);
                         clearInterval(timerInterval);
                         setIsTimedOut(true);
                         setIsActive(false);
-                        setWPM(calcResult());
+                        dispatch(setIsActiveTimer(false));
+                        dispatch(setWpm(calcResult()));
                         return 0;
                     }
                     return prevTimeLeft;
@@ -55,6 +71,11 @@ function Timer({ countdownInitialTime, animation, calcResult, keyDown, bugArr, u
         };
     }, [isActive, countdown]);
 
+    const clearAnimation = () => {
+        animation.seek(0);
+        animation.pause();
+    };
+
     const clearText = () => {
         const elementRef = textRef;
         const m = elementRef.current.querySelectorAll(".letter");
@@ -70,19 +91,14 @@ function Timer({ countdownInitialTime, animation, calcResult, keyDown, bugArr, u
         m[0].style.color = "#000";
     };
 
-    function startTimer() {
+    const startTimer = () => {
         setIsTimedOut(false);
         setIsActive(true);
-        blurRef.current.blur();
-        animation.play();
         clearText();
+        animation.play();
         bugArr = [];
         updateSum(-1);
-    }
-
-    const clearAnimation = () => {
-        animation.seek(0);
-        animation.pause();
+        dispatch(setIsActiveTimer(true));
     };
 
     const clearTime = () => {
@@ -90,6 +106,7 @@ function Timer({ countdownInitialTime, animation, calcResult, keyDown, bugArr, u
         setIsActive(false);
         clearAnimation();
         clearText();
+        dispatch(setIsActiveTimer(false));
     };
 
     function formatTime(time) {
@@ -100,39 +117,80 @@ function Timer({ countdownInitialTime, animation, calcResult, keyDown, bugArr, u
     const seconds = timeLeft % 60;
 
     return (
-        <Grid2
-            width={true}
-            sx={{
-                background: "transparent",
-                display: "flex",
-                justifyContent: "center",
-                flexFlow: "column",
-                alignItems: "center",
-                zIndex: 9999
-            }}
-        >
-            {isTimedOut ? (
-                <Typography variant="h3" fontSize="80px" color="#F95738">
-                    {WPM} WPM
-                </Typography>
-            ) : (
-                <Typography variant="h3" fontSize="80px" color="#F95738">
-                    {formatTime(minutes)}:{formatTime(seconds)}
-                </Typography>
-            )}
-            {/* <Typography variant="h3" fontSize="80px" color="#F95738">
-                {countdown}
-            </Typography> */}
-            {!isActive ? (
-                <Button ref={blurRef} variant="contained" color="primary" onClick={startTimer}>
-                    Start
-                </Button>
-            ) : (
-                <Button variant="contained" color="primary" onClick={clearTime}>
-                    Retry
-                </Button>
-            )}
-        </Grid2>
+        <Box>
+            <Grid2
+                sx={{
+                    margin: "0 auto",
+                    background: "transparent",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    zIndex: 9999,
+                    position: "relative",
+                    width: "calc(100% - 70px)"
+                }}
+            >
+                <IconButton
+                    onClick={startTimer}
+                    disabled={isActive}
+                    sx={{ p: 0, mr: -3 }}
+                >
+                    <PlayArrowIcon
+                        sx={{
+                            color: isActive
+                                ? "#777"
+                                : customization.bool
+                                ? "#fff"
+                                : "#000"
+                        }}
+                        fontSize="large"
+                    />
+                </IconButton>
+                <Box
+                    sx={{
+                        width: "max-content",
+                        background: customization.bool ? "#fff" : "#000",
+                        px: 1,
+                        borderRadius: 3,
+                        height: "35px",
+                        display: "flex",
+                        alignItems: "center",
+                        position: "relative",
+                        right: !isActive ? "-30px" : "30px",
+                        zIndex: 9999,
+                        transition: "all 400ms"
+                    }}
+                >
+                    {isTimedOut ? (
+                        <Wpm />
+                    ) : (
+                        <Typography
+                            variant="h3"
+                            fontSize="25px"
+                            color={customization.bool ? "#000" : "#fff"}
+                        >
+                            {formatTime(minutes)}:{formatTime(seconds)}
+                        </Typography>
+                    )}
+                </Box>
+                <IconButton
+                    onClick={clearTime}
+                    disabled={!isActive}
+                    sx={{ p: 0, ml: -3 }}
+                >
+                    <StopIcon
+                        sx={{
+                            color: !isActive
+                                ? "#777"
+                                : customization.bool
+                                ? "#fff"
+                                : "#000"
+                        }}
+                        fontSize="large"
+                    />
+                </IconButton>
+            </Grid2>
+        </Box>
     );
 }
 
