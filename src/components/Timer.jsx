@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setWpm } from "../reducers/wpm";
 import { setIsActiveTimer } from "../reducers/timer";
 
-const testTime = 10;
+const testTime = 60;
 
 function Timer({
     countdownInitialTime,

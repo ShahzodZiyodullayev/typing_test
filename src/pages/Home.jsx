@@ -101,16 +101,10 @@ const Home = () => {
         });
 
         modifiedText = modifiedText.join("");
-        modifiedText = modifiedText
-            .split(" ")
-            .filter((word) => !word.includes("_"));
+        modifiedText = modifiedText.split(" ").filter((word) => !word.includes("_"));
         modifiedText = modifiedText.filter((word) => word.trim().length);
         // setText(modifiedText);
-        return sum >= 0
-            ? Math.round(
-                  modifiedText.length * ((sum + 1 - bugArr.length) / (sum + 1))
-              )
-            : 0;
+        return sum >= 0 ? Math.round(modifiedText.length * ((sum + 1 - bugArr.length) / (sum + 1))) : 0;
     };
 
     const bugAnimation = () => {
@@ -160,6 +154,9 @@ const Home = () => {
                 --sum;
             }
         } else if (
+            ((e.keyCode > 31 && e.keyCode < 127) ||
+                (e.keyCode > 185 && e.keyCode < 193) ||
+                (e.keyCode > 218 && e.keyCode < 223)) &&
             e.key !== "Shift" &&
             m[sum + 1] &&
             m[sum + 1].textContent === e.key
@@ -176,6 +173,9 @@ const Home = () => {
                 m[sum + 1].style.color = "#000";
             }
         } else if (
+            ((e.keyCode > 31 && e.keyCode < 127) ||
+                (e.keyCode > 185 && e.keyCode < 193) ||
+                (e.keyCode > 218 && e.keyCode < 223)) &&
             e.key !== "Shift" &&
             m[sum + 1] &&
             m[sum + 1].textContent !== e.key
@@ -210,9 +210,7 @@ const Home = () => {
         >
             <Header>
                 <Timer
-                    countdownInitialTime={Math.round(
-                        ((DATA.length - 1) * 5 + 2000) / 1000
-                    )}
+                    countdownInitialTime={Math.round(((DATA.length - 1) * 5 + 2000) / 1000)}
                     animation={animation}
                     calcResult={calcResult}
                     keyDown={keyDown}
