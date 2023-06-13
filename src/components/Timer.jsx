@@ -3,28 +3,25 @@ import { Box, IconButton, Typography } from "@mui/material";
 import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
 import StopIcon from "@mui/icons-material/Stop";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import anime from "animejs/lib/anime.es.js";
 import Wpm from "./Wpm";
 import { useDispatch, useSelector } from "react-redux";
 import { setWpm } from "../reducers/wpm";
 import { setIsActiveTimer } from "../reducers/timer";
 
-const testTime = 60;
+const testTime = 10;
 
-function Timer({
-    countdownInitialTime,
-    animation,
-    calcResult,
-    keyDown,
-    bugArr,
-    updateSum,
-    textRef
-}) {
+function Timer({ countdownInitialTime, animation, calcResult, keyDown, bugArr, updateSum, textRef }) {
     const dispatch = useDispatch();
     const { customization, DATA } = useSelector((state) => state);
     const [countdown, setCountdown] = useState(countdownInitialTime);
     const [isActive, setIsActive] = useState(false);
     const [timeLeft, setTimeLeft] = useState(testTime);
     const [isTimedOut, setIsTimedOut] = useState(false);
+
+    let timerAnimation = anime.timeline({
+        targets: ".time"
+    });
 
     useEffect(() => {
         let countdownInterval = null;
@@ -37,17 +34,23 @@ function Timer({
         } else if (isActive && countdown === 0) {
             countdownInterval = setInterval(() => {
                 setTimeLeft((prevTimeLeft) => {
-                    if (prevTimeLeft <= testTime)
-                        document.addEventListener("keydown", keyDown);
-                    if (prevTimeLeft === 1)
-                        document.removeEventListener("keydown", keyDown);
+                    if (prevTimeLeft <= testTime) document.addEventListener("keydown", keyDown);
+                    if (prevTimeLeft === 1) document.removeEventListener("keydown", keyDown);
                     if (prevTimeLeft === 0) {
                         clearInterval(countdownInterval);
                         clearInterval(timerInterval);
                         setIsTimedOut(true);
                         setIsActive(false);
-                        // dispatch(setIsActiveTimer(false));
+                        dispatch(setIsActiveTimer(false));
                         dispatch(setWpm(calcResult()));
+                        timerAnimation.add({
+                            translateX: { value: "0px", duration: 600 },
+                            scaleX: [
+                                { value: 1.3, duration: 150, easing: "easeOutExpo" },
+                                { value: 1, duration: 450 }
+                            ],
+                            easing: "easeOutElastic(1, .8)"
+                        });
                         return 0;
                     }
                     return prevTimeLeft;
@@ -92,6 +95,14 @@ function Timer({
     };
 
     const startTimer = () => {
+        timerAnimation.add({
+            translateX: { value: "-60px", duration: 600 },
+            scaleX: [
+                { value: 1.3, duration: 150, easing: "easeOutExpo" },
+                { value: 1, duration: 450 }
+            ],
+            easing: "easeOutElastic(1, .8)"
+        });
         setIsTimedOut(false);
         setIsActive(true);
         animation.play();
@@ -102,6 +113,14 @@ function Timer({
     };
 
     const clearTime = () => {
+        timerAnimation.add({
+            translateX: { value: "0px", duration: 600 },
+            scaleX: [
+                { value: 1.3, duration: 150, easing: "easeOutExpo" },
+                { value: 1, duration: 450 }
+            ],
+            easing: "easeOutElastic(1, .8)"
+        });
         setIsTimedOut(false);
         setIsActive(false);
         clearAnimation();
@@ -134,14 +153,11 @@ function Timer({
                     onClick={startTimer}
                     disabled={isActive}
                     sx={{ p: 0, mr: -3 }}
+                    className="play-button"
                 >
                     <PlayArrowIcon
                         sx={{
-                            color: isActive
-                                ? "#777"
-                                : customization.bool
-                                ? "#fff"
-                                : "#000"
+                            color: isActive ? "#777" : customization.bool ? "#fff" : "#000"
                         }}
                         fontSize="large"
                     />
@@ -153,22 +169,20 @@ function Timer({
                         px: 1,
                         borderRadius: 3,
                         height: "35px",
-                        display: "flex",
-                        alignItems: "center",
+                        // ...(!isActive && { right: "-30px" }),
+                        // display: "flex",
+                        // alignItems: "center",
                         position: "relative",
-                        right: !isActive ? "-30px" : "30px",
-                        zIndex: 9999,
-                        transition: "all 400ms"
+                        right: "-30px",
+                        zIndex: 9999
+                        // transition: "all 400ms"
                     }}
+                    className="time"
                 >
                     {isTimedOut ? (
                         <Wpm />
                     ) : (
-                        <Typography
-                            variant="h3"
-                            fontSize="25px"
-                            color={customization.bool ? "#000" : "#fff"}
-                        >
+                        <Typography variant="h3" fontSize="25px" color={customization.bool ? "#000" : "#fff"}>
                             {formatTime(minutes)}:{formatTime(seconds)}
                         </Typography>
                     )}
@@ -177,14 +191,11 @@ function Timer({
                     onClick={clearTime}
                     disabled={!isActive}
                     sx={{ p: 0, ml: -3 }}
+                    className="stop-button"
                 >
                     <StopIcon
                         sx={{
-                            color: !isActive
-                                ? "#777"
-                                : customization.bool
-                                ? "#fff"
-                                : "#000"
+                            color: !isActive ? "#777" : customization.bool ? "#fff" : "#000"
                         }}
                         fontSize="large"
                     />
